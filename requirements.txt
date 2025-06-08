@@ -17,3 +17,4 @@ pydantic-core
 anyio
 httpx
 typing_extensions
+itsdangerous==2.2.0 
