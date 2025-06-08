@@ -11,7 +11,7 @@ argon2-cffi
 argon2-cffi-bindings
 
 # Essential dependencies often pulled by FastAPI/Authlib, but good to list for clarity
-starlette
+starlette==0.37.0 
 pydantic
 pydantic-core
 anyio
