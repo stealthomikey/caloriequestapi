@@ -2,12 +2,13 @@
 
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware, SessionCookieParameters 
+from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.sessions.base import SessionCookieParameters # <--- Use this path
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 from app.database import Base, engine
 # Corrected 'user_action' to 'user_actions' here:
-from app.routers import auth, redirect, meals, foods, user_actions 
+from app.routers import auth, redirect, meals, foods, user_action
 import os
 
 # load encrypted variables from .env file
