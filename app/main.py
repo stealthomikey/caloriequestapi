@@ -2,10 +2,8 @@
 
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.sessions import SessionMiddleware, SessionCookieParameters 
 from starlette.responses import JSONResponse
-# NEW IMPORT: For explicitly defining session cookie parameters
-from starlette.middleware.sessions import SessionCookieParameters 
 from dotenv import load_dotenv
 from app.database import Base, engine
 # Corrected 'user_action' to 'user_actions' here:
