@@ -22,4 +22,4 @@ typing_extensions==4.5.0 # Compatible with Pydantic 1.x / FastAPI 0.95.2
 openfoodfacts
 
 # Starlette version as requested
-starlette=0.46.2
+starlette==0.46.2
