@@ -2,14 +2,21 @@
 
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware
-from starlette.middleware.sessions.base import SessionCookieParameters # <--- Use this path
+from starlette.middleware.sessions import SessionMiddleware # SessionMiddleware is always here
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 from app.database import Base, engine
-# Corrected 'user_action' to 'user_actions' here:
-from app.routers import auth, redirect, meals, foods, user_action
+from app.routers import auth, redirect, meals, foods, user_actions # Corrected 'user_action' to 'user_actions'
 import os
+
+# NEW ROBUST IMPORT FOR SessionCookieParameters:
+try:
+    # Try the direct import path (common in newer Starlette versions like 0.38.0+)
+    from starlette.middleware.sessions import SessionCookieParameters
+except ImportError:
+    # Fallback to the .base submodule import path (common in Starlette 0.20.x - 0.37.x)
+    from starlette.middleware.sessions.base import SessionCookieParameters
+
 
 # load encrypted variables from .env file
 load_dotenv()
@@ -25,7 +32,11 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",     # Keep for local development
     "http://127.0.0.1:3000",     # Keep for local development
+    # ADD YOUR VERCEL FRONTEND URLS HERE FOR PRODUCTION
+    "https://your-frontend-name.vercel.app", # Example: Replace with your actual Vercel domain
     "https://*.vercel.app",      # Optional: Allows all Vercel subdomains of your project
+    # If your Render API is also consumed by itself for some reason, you might add its URL too
+    # "https://your-api-name.onrender.com",
 ]
 
 # middleware for cors
@@ -73,12 +84,11 @@ async def general_exception_handler(request: Request, exc: Exception):
         content={"message": "An unexpected error occurred. Please try again later."},
     )
 
-# Include Routers 
+# Include Routers
 app.include_router(redirect.router) # redirect router for auth redirection
 app.include_router(auth.router) # auth router for login and logout
 app.include_router(meals.router) # meal router for meal logging
 app.include_router(foods.router) # food router for foods
-# Corrected 'user_action' to 'user_actions' here:
 app.include_router(user_actions.router) # Corrected include for user actions router
 
 # api base path check
