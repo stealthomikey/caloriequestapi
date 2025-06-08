@@ -1,5 +1,5 @@
 # Core FastAPI, ASGI Server, and Database Connectivity
-fastapi
+fastapi==0.95.2  # <--- Pin FastAPI to a Pydantic v1 compatible version
 uvicorn
 SQLAlchemy
 asyncpg
@@ -9,12 +9,17 @@ python-dotenv
 Authlib
 argon2-cffi
 argon2-cffi-bindings
+itsdangerous==2.2.0 # As requested
 
-# Essential dependencies often pulled by FastAPI/Authlib, but good to list for clarity
-starlette==0.37.0 
-pydantic
-pydantic-core
-anyio
-httpx
-typing_extensions
-itsdangerous==2.2.0 
+# Essential dependencies for Pydantic v1 stack
+pydantic==1.10.15 # <--- Pydantic v1 version
+# pydantic-core # <--- REMOVE THIS ENTIRELY, NOT USED IN Pydantic v1
+anyio==3.7.1 # Compatible with FastAPI 0.95.2
+httpx==0.23.3 # Compatible with FastAPI 0.95.2
+typing_extensions==4.5.0 # Compatible with Pydantic 1.x / FastAPI 0.95.2
+
+# External API Integrations
+openfoodfacts
+
+# Starlette version as requested
+starlette==0.37.0 # <--- As requested by you
