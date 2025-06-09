@@ -4,7 +4,6 @@
 from pydantic import BaseModel, HttpUrl, Field
 from typing import List, Optional
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict # <--- ADD ConfigDict here!
 
 # schema for user creation
 class UserCreate(BaseModel):
@@ -74,15 +73,34 @@ class FoodProduct(BaseModel):
     nutriments: Nutriments
     model_config = {'from_attributes': True} 
 
-class ProductOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True) # Enables ORM mode
-
-    id: int
+    # Assuming you already have these or similar
+class ProductCreate(BaseModel):
     name: str
-    brand: str
-    quantity: str
-    calories: float
-    protein: float
-    carbs: float
-    fat: float
-    owner_id: int # To confirm it belongs to the user
+
+class MealCreate(BaseModel):
+    product_id: int
+    serving_size: float
+
+class MealOut(MealCreate):
+    id: int
+    consumed_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# NEW SCHEMAS for food logging
+class LoggedFoodCreate(BaseModel):
+    product_name: str = Field(..., description="Name of the food product.")
+    serving_size_g: float = Field(..., gt=0, description="Serving size in grams or ml.")
+    calories: float = Field(..., ge=0, description="Total calories for the serving.")
+    proteins: float = Field(..., ge=0, description="Total proteins for the serving.")
+    carbohydrates: float = Field(..., ge=0, description="Total carbohydrates for the serving.")
+    fats: float = Field(..., ge=0, description="Total fats for the serving.")
+
+class LoggedFoodOut(LoggedFoodCreate):
+    id: int
+    user_id: int
+    logged_at: datetime
+
+    class Config:
+        from_attributes = True

@@ -71,17 +71,3 @@ async def get_current_user_details(
         name=user_session_info["name"],
         email=user_session_info["email"]
     )
-
-from app.schemas import ProductOut # Ensure ProductOut is imported
-
-@router.get("/products", response_model=List[ProductOut], summary="Get all products added by the current user")
-async def get_user_products(
-    db: AsyncSession = Depends(get_db),
-    user_id: int = Depends(get_current_user_id)
-):
-    try:
-        products = await db_service.fetch_user_products(db, user_id)
-        return products
-    except Exception as e:
-        print(f"Error fetching user products: {e}")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to retrieve user products.")

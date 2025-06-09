@@ -1,27 +1,18 @@
 # app/main.py
-
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.sessions import SessionMiddleware # SessionMiddleware is always here
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import JSONResponse
 from dotenv import load_dotenv
 from app.database import Base, engine
-from app.routers import auth, redirect, meals, foods, user_actions # Corrected 'user_action' to 'user_actions'
+# Import the new food_logging router
+from app.routers import auth, redirect, meals, foods, user_action, openfoodfacts, food_logging
 import os
-
-# NEW ROBUST IMPORT FOR SessionCookieParameters:
-try:
-    # Try the direct import path (common in newer Starlette versions like 0.38.0+)
-    from starlette.middleware.sessions import SessionCookieParameters
-except ImportError:
-    # Fallback to the .base submodule import path (common in Starlette 0.20.x - 0.37.x)
-    from starlette.middleware.sessions.base import SessionCookieParameters
-
 
 # load encrypted variables from .env file
 load_dotenv()
 
-# initialise the api with description
+# intialise the api with description
 app = FastAPI(
     title="MDL Showcase API",
     description="Used for the backend logic for the calorie counting app.",
@@ -30,13 +21,8 @@ app = FastAPI(
 
 # cors for safe cross-origin requests
 origins = [
-    "http://localhost:3000",     # Keep for local development
-    "http://127.0.0.1:3000",     # Keep for local development
-    # ADD YOUR VERCEL FRONTEND URLS HERE FOR PRODUCTION
-    "https://your-frontend-name.vercel.app", # Example: Replace with your actual Vercel domain
-    "https://*.vercel.app",      # Optional: Allows all Vercel subdomains of your project
-    # If your Render API is also consumed by itself for some reason, you might add its URL too
-    # "https://your-api-name.onrender.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 # middleware for cors
@@ -48,23 +34,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define explicit session cookie parameters for deployment
-# On Render/Vercel, both frontend and backend will be on HTTPS.
-# Setting samesite="none" allows cross-site cookies, but REQUIRES secure=True.
-session_cookie_params = SessionCookieParameters(
-    samesite="none",  # Critical for cross-site cookie sending on HTTPS
-    secure=True,      # Critical: MUST be True when SameSite='none' (for HTTPS)
-    httponly=True,    # Good security practice
-    max_age=3600 * 24 * 7, # Example: 7 days validity
-    path="/"
-)
-
 # session middleware for user sessions
-app.add_middleware(
-    SessionMiddleware,
-    secret_key=os.getenv("SECRET_KEY"),
-    session_cookie_parameters=session_cookie_params # Pass the custom parameters
-)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 # error handling
 @app.exception_handler(HTTPException)
@@ -89,7 +60,9 @@ app.include_router(redirect.router) # redirect router for auth redirection
 app.include_router(auth.router) # auth router for login and logout
 app.include_router(meals.router) # meal router for meal logging
 app.include_router(foods.router) # food router for foods
-app.include_router(user_actions.router) # Corrected include for user actions router
+app.include_router(user_action.router) # user action router for
+app.include_router(openfoodfacts.router) # Include the openfoodfacts router
+app.include_router(food_logging.router) # NEW: Include the food_logging router
 
 # api base path check
 @app.get("/", tags=["Root"])
